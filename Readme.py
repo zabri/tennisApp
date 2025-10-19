@@ -1,19 +1,13 @@
-Perfect ⚡ Let’s build a clean, professional **README structure for GitHub**, written as if your app is an open-source or team-development project.
+# 🎾 Tennis Match Organiser App
 
-Here’s the full structure, ready for you to adapt:
-
----
-
-# 🎾 Tennis Match Organizer App
-
-A mobile app that helps friends **organize tennis matches effortlessly** — choose your availability, join or create a match, and see who’s playing on a visual court.
+A mobile app that helps friends **organise tennis matches effortlessly** — choose your availability, join or create a match, and see who’s playing on a visual court.
 The app integrates with **WhatsApp** to send real-time notifications for every match update.
 
 ---
 
 ## 📱 Overview
 
-The Tennis Match Organizer simplifies how tennis players coordinate games.
+The Tennis Match Organiser simplifies how tennis players coordinate games.
 Users can:
 
 * Select the **days and times** they’re available to play.
