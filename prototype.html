@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎾 Tennis Match Organizer - Prototype</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 25px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            border-radius: 15px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            transition: transform 0.3s ease;
+            transform: translateX(0);
+        }
+
+        .screen.hidden {
+            transform: translateX(100%);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #FFD700;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .content {
+            padding: 20px;
+            height: calc(100% - 80px);
+            overflow-y: auto;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #2E7D32;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #2E7D32;
+            border: 2px solid #2E7D32;
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        .btn-google {
+            background: #4285F4;
+            color: white;
+        }
+
+        .btn-apple {
+            background: #000;
+            color: white;
+            border: 1px solid #333;
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+        }
+
+        .profile-card {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .profile-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+            background: #FFB74D;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calendar-day.available {
+            background: #2E7D32;
+        }
+
+        .calendar-day.match {
+            background: #f44336;
+        }
+
+        .calendar-day.unavailable {
+            background: #333;
+        }
+
+        .calendar-day.selected {
+            background: #FFB74D;
+        }
+
+        .match-card {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            border-left: 4px solid #2E7D32;
+        }
+
+        .match-time {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .match-players {
+            color: #ccc;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .court-container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .court-svg {
+            width: 100%;
+            height: 300px;
+            background: #2E7D32;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .player-slot {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            background: #FFB74D;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 3px solid #fff;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .player-slot.empty {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        .bench {
+            margin-top: 20px;
+        }
+
+        .bench-player {
+            display: inline-block;
+            background: #757575;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        .navigation {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #2a2a2a;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            border-top: 1px solid #333;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active {
+            color: #FFD700;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+        }
+
+        .otp-input {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .otp-digit {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 20px;
+            background: #2a2a2a;
+            color: white;
+        }
+
+        .otp-digit:focus {
+            border-color: #FFD700;
+            outline: none;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .time-slot {
+            padding: 15px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .time-slot.selected {
+            border-color: #FFD700;
+            background: #2E7D32;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- Splash Screen -->
+        <div class="screen" id="splash">
+            <div class="content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
+                <div style="font-size: 60px; margin-bottom: 20px;">🎾</div>
+                <h1 style="font-size: 28px; margin-bottom: 10px; color: #FFD700;">TENNIS</h1>
+                <h2 style="font-size: 18px; margin-bottom: 30px; color: #ccc;">Match Organizer</h2>
+                <div style="width: 40px; height: 40px; border: 3px solid #333; border-top: 3px solid #FFD700; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            </div>
+        </div>
+
+        <!-- Login Screen -->
+        <div class="screen hidden" id="login">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('splash')">←</button>
+                <div class="title">Welcome Back!</div>
+                <div></div>
+            </div>
+            <div class="content">
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">🎾</div>
+                    <h2 style="color: #FFD700; margin-bottom: 10px;">Welcome Back!</h2>
+                    <p style="color: #ccc;">Sign in to continue</p>
+                </div>
+
+                <button class="btn btn-whatsapp" onclick="showScreen('otp')">
+                    📱 WhatsApp Login
+                </button>
+                <button class="btn btn-google" onclick="showToast('Google login')">
+                    🔵 Google Sign-In
+                </button>
+                <button class="btn btn-apple" onclick="showToast('Apple login')">
+                    🍎 Apple Sign-In
+                </button>
+                <button class="btn btn-secondary" onclick="showToast('Email login')">
+                    📧 Email & Password
+                </button>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <p style="color: #ccc;">New User? <span style="color: #FFD700; cursor: pointer;">Sign Up</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- OTP Screen -->
+        <div class="screen hidden" id="otp">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('login')">←</button>
+                <div class="title">Verify Phone</div>
+                <div></div>
+            </div>
+            <div class="content">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">📱</div>
+                    <h2 style="color: #FFD700; margin-bottom: 10px;">Verify Phone</h2>
+                    <p style="color: #ccc;">Enter OTP sent to:</p>
+                    <p style="color: #FFD700; font-weight: bold;">+30 694 123 4567</p>
+                </div>
+
+                <div class="otp-input">
+                    <input type="text" class="otp-digit" maxlength="1">
+                    <input type="text" class="otp-digit" maxlength="1">
+                    <input type="text" class="otp-digit" maxlength="1">
+                    <input type="text" class="otp-digit" maxlength="1">
+                </div>
+
+                <button class="btn btn-secondary" onclick="showToast('OTP resent')">
+                    Resend OTP
+                </button>
+                <button class="btn btn-primary" onclick="showScreen('profile')">
+                    Verify & Continue
+                </button>
+            </div>
+        </div>
+
+        <!-- Profile Setup -->
+        <div class="screen hidden" id="profile">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('otp')">←</button>
+                <div class="title">Complete Profile</div>
+                <div></div>
+            </div>
+            <div class="content">
+                <div class="profile-card">
+                    <div class="profile-photo">👤</div>
+                    <button class="btn btn-secondary" style="width: auto; margin: 0;">📷 Add Photo</button>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #ccc; display: block; margin-bottom: 5px;">Name:</label>
+                    <input type="text" value="Andrei Z." style="width: 100%; padding: 15px; background: #2a2a2a; border: 1px solid #333; border-radius: 8px; color: white;">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #ccc; display: block; margin-bottom: 5px;">Phone:</label>
+                    <input type="text" value="+30 694 123 4567" style="width: 100%; padding: 15px; background: #2a2a2a; border: 1px solid #333; border-radius: 8px; color: white;">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #ccc; display: block; margin-bottom: 10px;">Skill Level:</label>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" style="flex: 1;">Beginner</button>
+                        <button class="btn btn-secondary" style="flex: 1;">Intermediate</button>
+                        <button class="btn btn-secondary" style="flex: 1;">Advanced</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showScreen('dashboard')">
+                    Continue
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="screen hidden" id="dashboard">
+            <div class="header">
+                <div class="title">Dashboard</div>
+                <button class="back-btn" onclick="showScreen('profile')">⚙️</button>
+            </div>
+            <div class="content">
+                <div class="profile-card">
+                    <div class="profile-photo">👤</div>
+                    <h3 style="color: #FFD700; margin-bottom: 5px;">Andrei Z.</h3>
+                    <p style="color: #ccc;">🏆 12 matches played</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0;">
+                    <button class="btn btn-primary" onclick="showScreen('calendar')">
+                        📅 Set Availability
+                    </button>
+                    <button class="btn btn-primary" onclick="showScreen('matches')">
+                        🔍 Find Matches
+                    </button>
+                </div>
+
+                <button class="btn btn-secondary" onclick="showToast('Create Match')">
+                    ➕ Create Match
+                </button>
+
+                <div style="margin-top: 30px;">
+                    <h3 style="color: #FFD700; margin-bottom: 15px;">📅 Upcoming:</h3>
+                    <div class="match-card">
+                        <div class="match-time">Sat 18:00 - Court 1</div>
+                        <div class="match-players">2/4 players • Join now!</div>
+                    </div>
+                    <div class="match-card">
+                        <div class="match-time">Mon 20:00 - Court 2</div>
+                        <div class="match-players">3/4 players • Almost full!</div>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number">8</div>
+                        <div style="color: #ccc;">Wins</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">4</div>
+                        <div style="color: #ccc;">Losses</div>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <div class="nav-item active" onclick="showScreen('dashboard')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('calendar')">
+                    <div class="nav-icon">📅</div>
+                    <div class="nav-label">Calendar</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('matches')">
+                    <div class="nav-icon">🎾</div>
+                    <div class="nav-label">Matches</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('court')">
+                    <div class="nav-icon">🏟️</div>
+                    <div class="nav-label">Court</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('profile')">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">Profile</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Screen -->
+        <div class="screen hidden" id="calendar">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('dashboard')">←</button>
+                <div class="title">October 2024</div>
+                <div>←</div>
+            </div>
+            <div class="content">
+                <div class="calendar">
+                    <div style="text-align: center; padding: 10px; color: #ccc;">S</div>
+                    <div style="text-align: center; padding: 10px; color: #ccc;">M</div>
+                    <div style="text-align: center; padding: 10px; color: #ccc;">T</div>
+                    <div style="text-align: center; padding: 10px; color: #ccc;">W</div>
+                    <div style="text-align: center; padding: 10px; color: #ccc;">T</div>
+                    <div style="text-align: center; padding: 10px; color: #ccc;">F</div>
+                    <div style="text-align: center; padding: 10px; color: #ccc;">S</div>
+                    
+                    <div class="calendar-day unavailable">6</div>
+                    <div class="calendar-day unavailable">7</div>
+                    <div class="calendar-day unavailable">8</div>
+                    <div class="calendar-day unavailable">9</div>
+                    <div class="calendar-day unavailable">10</div>
+                    <div class="calendar-day unavailable">11</div>
+                    <div class="calendar-day unavailable">12</div>
+                    
+                    <div class="calendar-day unavailable">13</div>
+                    <div class="calendar-day unavailable">14</div>
+                    <div class="calendar-day unavailable">15</div>
+                    <div class="calendar-day unavailable">16</div>
+                    <div class="calendar-day unavailable">17</div>
+                    <div class="calendar-day unavailable">18</div>
+                    <div class="calendar-day unavailable">19</div>
+                    
+                    <div class="calendar-day available" onclick="showScreen('availability')">20</div>
+                    <div class="calendar-day match">21</div>
+                    <div class="calendar-day available" onclick="showScreen('availability')">22</div>
+                    <div class="calendar-day available" onclick="showScreen('availability')">23</div>
+                    <div class="calendar-day match">24</div>
+                    <div class="calendar-day available" onclick="showScreen('availability')">25</div>
+                    <div class="calendar-day unavailable">26</div>
+                    
+                    <div class="calendar-day available" onclick="showScreen('availability')">27</div>
+                    <div class="calendar-day available" onclick="showScreen('availability')">28</div>
+                    <div class="calendar-day match">29</div>
+                    <div class="calendar-day available" onclick="showScreen('availability')">30</div>
+                    <div class="calendar-day unavailable">31</div>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <div style="display: flex; align-items: center; margin: 10px 0;">
+                        <div style="width: 20px; height: 20px; background: #2E7D32; border-radius: 4px; margin-right: 10px;"></div>
+                        <span style="color: #ccc;">Available</span>
+                    </div>
+                    <div style="display: flex; align-items: center; margin: 10px 0;">
+                        <div style="width: 20px; height: 20px; background: #f44336; border-radius: 4px; margin-right: 10px;"></div>
+                        <span style="color: #ccc;">Match Scheduled</span>
+                    </div>
+                    <div style="display: flex; align-items: center; margin: 10px 0;">
+                        <div style="width: 20px; height: 20px; background: #333; border-radius: 4px; margin-right: 10px;"></div>
+                        <span style="color: #ccc;">Not Available</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showScreen('availability')">
+                    Set My Availability
+                </button>
+            </div>
+            <div class="navigation">
+                <div class="nav-item" onclick="showScreen('dashboard')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item active" onclick="showScreen('calendar')">
+                    <div class="nav-icon">📅</div>
+                    <div class="nav-label">Calendar</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('matches')">
+                    <div class="nav-icon">🎾</div>
+                    <div class="nav-label">Matches</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('court')">
+                    <div class="nav-icon">🏟️</div>
+                    <div class="nav-label">Court</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('profile')">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">Profile</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Availability Setting -->
+        <div class="screen hidden" id="availability">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('calendar')">←</button>
+                <div class="title">Oct 20, 2024</div>
+                <div></div>
+            </div>
+            <div class="content">
+                <h3 style="color: #FFD700; margin-bottom: 20px;">Select Time Slots:</h3>
+                
+                <div class="time-slots">
+                    <div class="time-slot" onclick="toggleTimeSlot(this)">
+                        <div style="font-size: 20px;">🌅</div>
+                        <div>08:00-10:00</div>
+                    </div>
+                    <div class="time-slot" onclick="toggleTimeSlot(this)">
+                        <div style="font-size: 20px;">☀️</div>
+                        <div>10:00-12:00</div>
+                    </div>
+                    <div class="time-slot" onclick="toggleTimeSlot(this)">
+                        <div style="font-size: 20px;">🌞</div>
+                        <div>14:00-16:00</div>
+                    </div>
+                    <div class="time-slot selected" onclick="toggleTimeSlot(this)">
+                        <div style="font-size: 20px;">🌆</div>
+                        <div>16:00-18:00</div>
+                    </div>
+                    <div class="time-slot" onclick="toggleTimeSlot(this)">
+                        <div style="font-size: 20px;">🌙</div>
+                        <div>18:00-20:00</div>
+                    </div>
+                    <div class="time-slot" onclick="toggleTimeSlot(this)">
+                        <div style="font-size: 20px;">🌃</div>
+                        <div>20:00-22:00</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showToast('Availability saved!'); showScreen('calendar')">
+                    Save Availability
+                </button>
+            </div>
+        </div>
+
+        <!-- Matches Screen -->
+        <div class="screen hidden" id="matches">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('dashboard')">←</button>
+                <div class="title">Available Matches</div>
+                <div></div>
+            </div>
+            <div class="content">
+                <h3 style="color: #FFD700; margin-bottom: 15px;">📅 Today</h3>
+                <div class="match-card" onclick="showScreen('match-detail')">
+                    <div class="match-time">18:00-20:00</div>
+                    <div class="match-players">Court 1 • 2/4 players</div>
+                    <button class="btn btn-primary" style="width: auto; margin-top: 10px;">Join Match</button>
+                </div>
+
+                <h3 style="color: #FFD700; margin: 30px 0 15px;">📅 Tomorrow</h3>
+                <div class="match-card" onclick="showScreen('match-detail')">
+                    <div class="match-time">16:00-18:00</div>
+                    <div class="match-players">Court 2 • 3/4 players</div>
+                    <button class="btn btn-primary" style="width: auto; margin-top: 10px;">Join Match</button>
+                </div>
+
+                <h3 style="color: #FFD700; margin: 30px 0 15px;">📅 Saturday</h3>
+                <div class="match-card" onclick="showScreen('match-detail')">
+                    <div class="match-time">10:00-12:00</div>
+                    <div class="match-players">Court 1 • 1/4 players</div>
+                    <button class="btn btn-primary" style="width: auto; margin-top: 10px;">Join Match</button>
+                </div>
+            </div>
+            <div class="navigation">
+                <div class="nav-item" onclick="showScreen('dashboard')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('calendar')">
+                    <div class="nav-icon">📅</div>
+                    <div class="nav-label">Calendar</div>
+                </div>
+                <div class="nav-item active" onclick="showScreen('matches')">
+                    <div class="nav-icon">🎾</div>
+                    <div class="nav-label">Matches</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('court')">
+                    <div class="nav-icon">🏟️</div>
+                    <div class="nav-label">Court</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('profile')">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">Profile</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match Detail -->
+        <div class="screen hidden" id="match-detail">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('matches')">←</button>
+                <div class="title">Match Details</div>
+                <div></div>
+            </div>
+            <div class="content">
+                <div style="background: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <h3 style="color: #FFD700; margin-bottom: 10px;">🎾 Match Details</h3>
+                    <p style="color: #ccc; margin: 5px 0;">📅 Oct 20, 2024</p>
+                    <p style="color: #ccc; margin: 5px 0;">🕐 18:00-20:00</p>
+                    <p style="color: #ccc; margin: 5px 0;">🏟️ Court 1</p>
+                </div>
+
+                <div style="background: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <h3 style="color: #FFD700; margin-bottom: 15px;">👥 Players (2/4):</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <div style="width: 50px; height: 50px; background: #FFB74D; border-radius: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold;">A</div>
+                        <div style="width: 50px; height: 50px; background: #FFB74D; border-radius: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold;">M</div>
+                        <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 25px; display: flex; align-items: center; justify-content: center; color: #ccc;">+</div>
+                        <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 25px; display: flex; align-items: center; justify-content: center; color: #ccc;">+</div>
+                    </div>
+                    <p style="color: #ccc; font-size: 14px;">Andrei, Maria</p>
+                </div>
+
+                <div style="background: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <h3 style="color: #FFD700; margin-bottom: 15px;">🪑 Bench (1):</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="width: 50px; height: 50px; background: #757575; border-radius: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">J</div>
+                    </div>
+                    <p style="color: #ccc; font-size: 14px; margin-top: 10px;">John</p>
+                </div>
+
+                <button class="btn btn-primary" onclick="showScreen('court')">
+                    Join Match
+                </button>
+            </div>
+        </div>
+
+        <!-- Court View -->
+        <div class="screen hidden" id="court">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('match-detail')">←</button>
+                <div class="title">Live Court View</div>
+                <div></div>
+            </div>
+            <div class="content">
+                <div class="court-container">
+                    <svg width="360" height="560" viewBox="0 0 360 560" style="display: block; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));">
+                        <defs>
+                            {/* Net pattern */}
+                            <pattern id="netPattern" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+                                <rect width="10" height="10" fill="none" stroke="#333" strokeWidth="0.8"/>
+                            </pattern>
+                            
+                            {/* Net gradient for depth */}
+                            <linearGradient id="netGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color: #1a1a1a; stop-opacity: 1" />
+                                <stop offset="100%" style="stop-color: #000; stop-opacity: 1" />
+                            </linearGradient>
+                        </defs>
+                        
+                        {/* Court surface */}
+                        <rect x="30" y="30" width="300" height="500" fill="#2E7D32" stroke="#1565C0" strokeWidth="4"/>
+                        
+                        {/* Doubles sidelines (outer boundary) */}
+                        <rect x="30" y="30" width="300" height="500" fill="none" stroke="#fff" strokeWidth="3"/>
+                        
+                        {/* Singles sidelines */}
+                        <line x1="75" y1="30" x2="75" y2="530" stroke="#fff" strokeWidth="2.5"/>
+                        <line x1="285" y1="30" x2="285" y2="530" stroke="#fff" strokeWidth="2.5"/>
+                        
+                        {/* Baseline - Top */}
+                        <line x1="30" y1="30" x2="330" y2="30" stroke="#fff" strokeWidth="3"/>
+                        
+                        {/* Baseline - Bottom */}
+                        <line x1="30" y1="530" x2="330" y2="530" stroke="#fff" strokeWidth="3"/>
+                        
+                        {/* Service line - Top half */}
+                        <line x1="75" y1="180" x2="285" y2="180" stroke="#fff" strokeWidth="2.5"/>
+                        
+                        {/* Service line - Bottom half */}
+                        <line x1="75" y1="350" x2="285" y2="350" stroke="#fff" strokeWidth="2.5"/>
+                        
+                        {/* Center service line - Top half */}
+                        <line x1="180" y1="180" x2="180" y2="265" stroke="#fff" strokeWidth="2"/>
+                        
+                        {/* Center service line - Bottom half */}
+                        <line x1="180" y1="265" x2="180" y2="350" stroke="#fff" strokeWidth="2"/>
+                        
+                        {/* Center mark - Top baseline */}
+                        <line x1="180" y1="30" x2="180" y2="50" stroke="#fff" strokeWidth="2"/>
+                        
+                        {/* Center mark - Bottom baseline */}
+                        <line x1="180" y1="510" x2="180" y2="530" stroke="#fff" strokeWidth="2"/>
+                        
+                        {/* NET AREA */}
+                        {/* Net shadow */}
+                        <rect x="25" y="265" width="310" height="8" fill="rgba(0,0,0,0.4)" />
+                        
+                        {/* Net white band (top of net) */}
+                        <rect x="30" y="262" width="300" height="5" fill="#fff" />
+                        
+                        {/* Net mesh */}
+                        <rect x="30" y="220" width="300" height="50" fill="url(#netPattern)" opacity="0.8"/>
+                        
+                        {/* Net posts */}
+                        <rect x="18" y="215" width="8" height="60" fill="#444" stroke="#222" strokeWidth="1" rx="2"/>
+                        <rect x="334" y="215" width="8" height="60" fill="#444" stroke="#222" strokeWidth="1" rx="2"/>
+                        
+                        {/* Net post caps */}
+                        <circle cx="22" cy="215" r="5" fill="#666"/>
+                        <circle cx="338" cy="215" r="5" fill="#666"/>
+                        
+                        {/* Net cables/support */}
+                        <line x1="30" y1="220" x2="330" y2="220" stroke="#000" strokeWidth="2"/>
+                        <line x1="30" y1="270" x2="330" y2="270" stroke="#000" strokeWidth="2"/>
+                        
+                        {/* Player slots */}
+                        {/* Top Left (Near side, left) */}
+                        <g onclick="leaveCourt(0)" style="cursor: pointer;">
+                            <circle cx="115" cy="450" r="40" 
+                                    fill="#FFB74D" 
+                                    stroke="#fff" strokeWidth="3" 
+                                    style="transition: all 0.2s;"/>
+                            <text x="115" y="458" textAnchor="middle" fill="#000" fontSize="16" fontWeight="bold">
+                                Andrei
+                            </text>
+                        </g>
+                        
+                        {/* Top Right (Near side, right) */}
+                        <g onclick="leaveCourt(1)" style="cursor: pointer;">
+                            <circle cx="245" cy="450" r="40" 
+                                    fill="#FFB74D" 
+                                    stroke="#fff" strokeWidth="3"
+                                    style="transition: all 0.2s;"/>
+                            <text x="245" y="458" textAnchor="middle" fill="#000" fontSize="16" fontWeight="bold">
+                                Maria
+                            </text>
+                        </g>
+                        
+                        {/* Bottom Left (Far side, left) */}
+                        <g onclick="leaveCourt(2)" style="cursor: pointer;">
+                            <circle cx="115" cy="110" r="40" 
+                                    fill="rgba(255,255,255,0.2)" 
+                                    stroke="#fff" strokeWidth="3"
+                                    style="transition: all 0.2s;"/>
+                            <text x="115" y="118" textAnchor="middle" fill="#fff" fontSize="16" fontWeight="bold">
+                                Empty
+                            </text>
+                        </g>
+                        
+                        {/* Bottom Right (Far side, right) */}
+                        <g onclick="leaveCourt(3)" style="cursor: pointer;">
+                            <circle cx="245" cy="110" r="40" 
+                                    fill="rgba(255,255,255,0.2)" 
+                                    stroke="#fff" strokeWidth="3"
+                                    style="transition: all 0.2s;"/>
+                            <text x="245" y="118" textAnchor="middle" fill="#fff" fontSize="16" fontWeight="bold">
+                                Empty
+                            </text>
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="bench">
+                    <h3 style="color: #FFD700; margin-bottom: 15px;">🪑 Bench:</h3>
+                    <div class="bench-player" onclick="showToast('John moved to court!')">John</div>
+                    <div class="bench-player" onclick="showToast('Alex moved to court!')">Alex</div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="showToast('Left the court')">
+                    Leave Court
+                </button>
+            </div>
+            <div class="navigation">
+                <div class="nav-item" onclick="showScreen('dashboard')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('calendar')">
+                    <div class="nav-icon">📅</div>
+                    <div class="nav-label">Calendar</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('matches')">
+                    <div class="nav-icon">🎾</div>
+                    <div class="nav-label">Matches</div>
+                </div>
+                <div class="nav-item active" onclick="showScreen('court')">
+                    <div class="nav-icon">🏟️</div>
+                    <div class="nav-label">Court</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('profile')">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">Profile</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentScreen = 'splash';
+
+        function showScreen(screenId) {
+            // Hide current screen
+            document.getElementById(currentScreen).classList.add('hidden');
+            
+            // Show new screen
+            document.getElementById(screenId).classList.remove('hidden');
+            currentScreen = screenId;
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 2000);
+        }
+
+        function toggleTimeSlot(element) {
+            element.classList.toggle('selected');
+        }
+
+        function leaveCourt(index) {
+            showToast('Player left the court!');
+        }
+
+        // Auto-advance from splash screen
+        setTimeout(() => {
+            showScreen('login');
+        }, 2000);
+
+        // OTP input handling
+        document.querySelectorAll('.otp-digit').forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < 3) {
+                    document.querySelectorAll('.otp-digit')[index + 1].focus();
+                }
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                    document.querySelectorAll('.otp-digit')[index - 1].focus();
+                }
+            });
+        });
+    </script>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</body>
+</html>
